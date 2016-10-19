@@ -10,9 +10,12 @@
     "node": ">= 4"
   },
   "scripts": {
-    "lint": "conventional-changelog-lint --from=master && coffeelint src",
     "docs:build": "mkdocs build",
     "docs:serve": "mkdocs serve",
+    "lint": "conventional-changelog-lint --from=master && coffeelint src",
+    "docs:install": "pip install -r docs/requirements.txt",
+    "docs:build": "sphinx-build -W -T -b html -d docs/_build/doctrees docs docs/_build/",
+    "docs:serve": "sphinx-autobuild docs docs/_build/",
     "build": "coffee -b -c -o lib/ src/ && coffee scripts/generate-cli-docs.coffee",
     "pretest": "npm run build",
     "test": "mocha \"test/**/*-test.coffee\"",
