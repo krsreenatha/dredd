@@ -32,7 +32,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Dredd'
 copyright = 'Apiary Czech Republic, s.r.o.'
-author = 'Apiary Czech Republic, s.r.o.'
+author = 'Apiary'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -54,6 +54,9 @@ add_function_parentheses = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+# Suppressed warnings
+suppress_warnings = ['image.nonlocal_uri']
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -109,8 +112,7 @@ html_show_copyright = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'dredd', 'Dredd Documentation',
-     [author], 1)
+    (master_doc, 'dredd', 'Dredd Documentation', [author], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -120,3 +122,19 @@ man_pages = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+
+
+# -- Hacks ----------------------------------------------------------------
+
+import sphinx.application
+
+# Hacking around the pygments-markdown-lexer issue:
+# https://github.com/jhermann/pygments-markdown-lexer/issues/6
+_original_warn = sphinx.application.Sphinx.warn
+
+def _warn(self, message, *args, **kwargs):
+    if not message.startswith('extension \'pygments_markdown_lexer\' has no setup() function'):
+        _original_warn(self, message, *args, **kwargs)
+
+sphinx.application.Sphinx.warn = _warn
