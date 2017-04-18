@@ -31,17 +31,12 @@ Dredd supports writing [hooks](https://dredd.readthedocs.io/en/latest/hooks/)
 - [Go](https://dredd.readthedocs.io/en/latest/hooks-go/)
 - [Node.js (JavaScript)](https://dredd.readthedocs.io/en/latest/hooks-nodejs/)
 - [Perl](https://dredd.readthedocs.io/en/latest/hooks-perl/)
-- [PHP](https://dredd.readthedocs.io/en/latest/hooks-php/)
-- [Python](https://dredd.readthedocs.io/en/latest/hooks-python/)
-- [Ruby](https://dredd.readthedocs.io/en/latest/hooks-ruby/)
-- Didn't find your favorite language? _[Add a new one!](https://dredd.readthedocs.io/en/latest/hooks-new-language/)_
-
-### Continuous Integration Support
+- [PHP](https://dredd.readthedocs.io/en/latest/hook
 
 - [Travis CI][]
 - [CircleCI][]
 - [Jenkins][]
-- _...and any other *nix based CI!_
+- _...and any other \*nix based CI!_
 
 ## Documentation Reference
 
