@@ -1,12 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import subprocess
 
 from recommonmark.parser import CommonMarkParser
+# from recommonmark.transform import AutoStructify
 
-# Dredd documentation build configuration file
+
+###########################################################################
+#                                                                         #
+#    Dredd documentation build configuration file                         #
+#                                                                         #
+###########################################################################
 
 
 # -- General configuration ------------------------------------------------
@@ -15,18 +18,15 @@ from recommonmark.parser import CommonMarkParser
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.intersphinx',
     'pygments_markdown_lexer',
 ]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-source_suffix = ['.rst', '.md']
-source_parsers = {
-    '.md': CommonMarkParser,
-}
+source_suffix = '.md'
+source_parsers = {'.md': CommonMarkParser}
 
-# The master toctree document.
+# The master document.
 master_doc = 'index'
 
 # General information about the project.
@@ -48,15 +48,13 @@ version = release
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-# If true, '()' will be appended to :func: etc. cross-reference text.
-#
-add_function_parentheses = True
-
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
 # Suppressed warnings
-suppress_warnings = ['image.nonlocal_uri']
+suppress_warnings = [
+    'image.nonlocal_uri',
+]
 
 
 # -- Options for HTML output ----------------------------------------------
@@ -84,7 +82,7 @@ else:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -120,9 +118,65 @@ man_pages = [
 # man_show_urls = False
 
 
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+# -- Custom Extensions ----------------------------------------------------
 
+import subprocess
+from sphinx.errors import SphinxError
+from sphinx.util.console import bold, blue
+
+docs_dir = os.path.dirname(__file__)
+node_modules_bin_dir = os.path.join(docs_dir, '..', 'node_modules', '.bin')
+
+js_extensions = {
+    'hercule': ['node', os.path.join(node_modules_bin_dir, 'hercule'), '--relative=' + docs_dir, '--stdin'],
+}
+js_extensions_dir = os.path.join(docs_dir, '_extensions')
+js_interpreters = {
+    '.js': 'node',
+    '.coffee': os.path.join(node_modules_bin_dir, 'coffee')
+}
+
+
+def init_js_extensions(app):
+    app.info(bold('initializing JavaScript extensions... '), nonl=True)
+    for basename in os.listdir(js_extensions_dir):
+        _, ext = os.path.splitext(basename)
+
+        if ext in js_interpreters.keys():
+            filename = os.path.join(js_extensions_dir, basename)
+            command = [js_interpreters[ext], filename]
+            js_extensions[basename] = command
+
+    if js_extensions:
+        app.connect('source-read', run_js_extensions)
+
+    app.info('{} found'.format(len(js_extensions)))
+    app.verbose('JavaScript extensions: ' + ', '.join(js_extensions.keys()))
+
+
+def run_js_extensions(app, docname, source_list):
+    for name, command in js_extensions.items():
+        app.verbose(bold("runnning JavaScript extension '{}'... ".format(name)) + blue(docname))
+
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        proc.stdin.write(source_list[0].encode('utf-8'))
+        proc.stdin.close()
+        source_list[0] = proc.stdout.read().decode('utf-8')
+        exitStatus = proc.wait()
+
+        if exitStatus:
+            message = "JavaScript extension '{}' finished with non-zero exit status: {}"
+            raise SphinxError(message.format(name, exitStatus))
+
+
+def setup(app):
+    init_js_extensions(app)
+
+    # app.add_config_value('recommonmark_config', {
+    #     'auto_toc_tree_section': 'Contents',
+    #     # 'enable_auto_doc_ref': True,
+    # }, True)
+    # app.add_transform(AutoStructify)
 
 
 # -- Hacks ----------------------------------------------------------------
