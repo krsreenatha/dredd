@@ -1,8 +1,10 @@
 import os
 import subprocess
 
+from sphinx.util import console
+from sphinx.errors import SphinxError
 from recommonmark.parser import CommonMarkParser
-# from recommonmark.transform import AutoStructify
+from recommonmark.transform import AutoStructify
 
 
 ###########################################################################
@@ -70,8 +72,7 @@ else:
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#
-# html_logo = None
+html_logo = '../img/dredd-logo.png'
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -105,24 +106,7 @@ html_show_copyright = False
 # html_use_opensearch = ''
 
 
-# -- Options for manual page output ---------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'dredd', 'Dredd Documentation', [author], 1)
-]
-
-# If true, show URL addresses after external links.
-#
-# man_show_urls = False
-
-
 # -- Custom Extensions ----------------------------------------------------
-
-import subprocess
-from sphinx.errors import SphinxError
-from sphinx.util.console import bold, blue
 
 docs_dir = os.path.dirname(__file__)
 node_modules_bin_dir = os.path.join(docs_dir, '..', 'node_modules', '.bin')
@@ -138,7 +122,7 @@ js_interpreters = {
 
 
 def init_js_extensions(app):
-    app.info(bold('initializing JavaScript extensions... '), nonl=True)
+    app.info(console.bold('initializing JavaScript extensions... '), nonl=True)
     for basename in os.listdir(js_extensions_dir):
         _, ext = os.path.splitext(basename)
 
@@ -156,7 +140,7 @@ def init_js_extensions(app):
 
 def run_js_extensions(app, docname, source_list):
     for name, command in js_extensions.items():
-        app.verbose(bold("runnning JavaScript extension '{}'... ".format(name)) + blue(docname))
+        app.verbose(console.bold("runnning JavaScript extension '{}'... ".format(name)) + console.blue(docname))
 
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         proc.stdin.write(source_list[0].encode('utf-8'))
@@ -172,11 +156,12 @@ def run_js_extensions(app, docname, source_list):
 def setup(app):
     init_js_extensions(app)
 
-    # app.add_config_value('recommonmark_config', {
-    #     'auto_toc_tree_section': 'Contents',
-    #     # 'enable_auto_doc_ref': True,
-    # }, True)
-    # app.add_transform(AutoStructify)
+    app.add_config_value('recommonmark_config', {
+        'enable_eval_rst': True,
+        'enable_auto_toc_tree': True,
+        'auto_toc_tree_section': 'Contents',
+    }, True)
+    app.add_transform(AutoStructify)
 
 
 # -- Hacks ----------------------------------------------------------------
