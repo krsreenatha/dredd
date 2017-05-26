@@ -5,7 +5,7 @@
 #
 # Usage:
 #
-#       $ cat document-template.md | coffee generate-cli-docs.coffee > document.md
+#   $ cat document-template.md | coffee generate-cli-docs.coffee > document.md
 
 
 fs = require('fs')
