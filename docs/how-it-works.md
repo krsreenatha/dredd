@@ -206,23 +206,23 @@ Dredd intentionally **does not support HTTP(S) proxies for testing**. Proxy can 
 
 
 [path-argument]: usage-cli.md#api-description-document-string
-[path-option]: usage-cli.md#-path-p
+[path-option]: usage-cli.md#path-p
 [apiary-reporter]: how-to-guides.md#using-apiary-reporter-and-apiary-tests
-[request-proxies]: https://github.com/request/request#proxies
+[request-proxies]: https://github.com/request/request#user-content-proxies
 
 [Apiary]: https://apiary.io/
 [Semantic Versioning]: http://semver.org/
-[API Blueprint]: http://apiblueprint.org/
+[API Blueprint]: https://apiblueprint.org/
 [Swagger]: http://swagger.io/
 [Gavel.js]: https://github.com/apiaryio/gavel.js
-[Gavel]: https://www.relishapp.com/apiary/gavel/docs
+[Gavel]: https://relishapp.com/apiary/gavel/docs
 [MSON]: https://github.com/apiaryio/mson
 [JSON Schema]: http://json-schema.org/
 [Swagger Adapter]: https://github.com/apiaryio/fury-adapter-swagger/
 [RFC6570]: https://tools.ietf.org/html/rfc6570
 
 [CircleCI]: https://circleci.com/
-[Travis CI]: http://travis-ci.org/
+[Travis CI]: https://travis-ci.org/
 [Terms of Service]: https://apiary.io/tos
 [Privacy Policy]: https://apiary.io/privacy
 [hostname]: https://en.wikipedia.org/wiki/Hostname

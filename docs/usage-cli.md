@@ -77,7 +77,7 @@ endpoint: "http://127.0.0.1:3000"
 Remember you can always list all available arguments by `dredd --help`.
 
 <% for option in @options: %>
-### --<%= option.name %><% if option.alias: %>, -<%= option.alias %><% end %>
+### \-\-<%= option.name %><% if option.alias: %>, -<%= option.alias %><% end %>
 
 <%= option.description %><br>
 <% if option.default: %>

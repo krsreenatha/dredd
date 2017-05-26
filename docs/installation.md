@@ -78,10 +78,10 @@ There are still [several known limitations][Windows Issues] when using Dredd on 
 [Windows Issues]: https://github.com/apiaryio/dredd/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aopen%20label%3AWindows%20
 [New Issue]: https://github.com/apiaryio/dredd/issues/new
 
-[Homebrew]: http://brew.sh/
+[Homebrew]: https://brew.sh/
 [Node.js]: https://nodejs.org/en/
 [nvm]: https://github.com/creationix/nvm
-[Download Node.js]: https://nodejs.org/en/#download
+[Download Node.js]: https://nodejs.org/en/download/
 [Install Node.js as system package]: https://nodejs.org/en/download/package-manager/
 
 [Drafter]: https://github.com/apiaryio/drafter
