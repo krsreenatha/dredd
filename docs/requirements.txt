@@ -1,5 +1,5 @@
-sphinx
-sphinx-autobuild
-sphinx_rtd_theme
-recommonmark
-pygments_markdown_lexer
+sphinx~=1.5.6
+sphinx-autobuild~=0.6.0
+sphinx-rtd-theme~=0.2.4
+recommonmark~=0.4.0
+pygments-markdown-lexer~=0.1.0.dev39
