@@ -1,5 +1,7 @@
 import os
+import re
 import subprocess
+from docutils import nodes
 
 from sphinx.util import console
 from sphinx.errors import SphinxError
@@ -153,8 +155,45 @@ def run_js_extensions(app, docname, source_list):
             raise SphinxError(message.format(name, exitStatus))
 
 
+ref_data = {}
+
+
+def collect_ref_data(app, doctree):
+    targets = []
+    references = []
+
+    for node in doctree.traverse(nodes.raw):
+        if 'name=' in node.rawsource:
+            match = re.search(r'name="([^\"]+)', node.rawsource)
+            if match:
+                targets.append(match.group(1))
+        elif 'id=' in node.rawsource:
+            match = re.search(r'id="([^\"]+)', node.rawsource)
+            if match:
+                targets.append(match.group(1))
+
+    for node in doctree.traverse(nodes.section):
+        for target in frozenset(node.attributes.get('ids', [])):
+            targets.append(target)
+
+    for node in doctree.traverse(nodes.reference):
+        uri = node.get('refuri')
+        if uri and not uri.startswith(('http://', 'https://')):
+            references.append(uri)
+
+    filename = doctree.attributes['source'].replace(docs_dir, '')
+    ref_data[filename] = {'targets': targets, 'references': references}
+
+
+def process_refs(app, doctree, docname):
+    print(ref_data)
+
+
 def setup(app):
     init_js_extensions(app)
+
+    app.connect('doctree-read', collect_ref_data)
+    app.connect('doctree-resolved', process_refs)
 
     app.add_config_value('recommonmark_config', {
         'enable_eval_rst': True,
