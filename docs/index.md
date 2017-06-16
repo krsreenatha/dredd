@@ -61,7 +61,7 @@ Dredd supports writing [hooks](hooks.md)
 - [Hooks: PHP](hooks-php.md)
 - [Hooks: Python](hooks-python.md)
 - [Hooks: Ruby](hooks-ruby.md)
-- [Other Languages](hooks-new-language.md)
+- [Hooks: Other Languages](hooks-new-language.md)
 - [Data Structures](data-structures.md)
 - [Contributing](contributing.md)
 
