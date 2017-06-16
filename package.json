@@ -64,7 +64,7 @@
     "drafter": "^1.0.0",
     "ect": "^0.5.9",
     "express": "^4.15.2",
-    "hercule": "^4.0.0",
+    "hercule": "^4.0.1",
     "jscoverage": "^0.6.0",
     "lcov-result-merger": "^1.2.0",
     "mocha": "^3.0.0",
