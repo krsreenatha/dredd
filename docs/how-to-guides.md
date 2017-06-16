@@ -163,7 +163,7 @@ Often you want to test a sequence of steps, a scenario, rather than just one req
 
 To test various scenarios, you will want to write each of them into a separate API description document. To load them during a single test run, use the [--path](usage-cli.md#path-p) option.
 
-For workflows to work properly, you'll also need to keep **shared context** between individual HTTP transactions. You can use [hooks](hooks.md) in order to achieve that. See tips on how to [pass data between transactions](hooks.md#sharing-data-between-steps-in-request-stash).
+For workflows to work properly, you'll also need to keep **shared context** between individual HTTP transactions. You can use [hooks](hooks.md) in order to achieve that. See tips on how to [pass data between transactions](hooks-nodejs.md#sharing-data-between-steps-in-request-stash).
 
 ### API Blueprint Example
 
@@ -514,7 +514,7 @@ info: Resource > Update Resource > Example 1
 info: Resource > Update Resource > Example 2
 ```
 
-In case you need to perform particular request with different URI parameters and standard inheritance of URI parameters isn't working for you, try [modifying transaction before its execution](hooks.md#modifying-transactions-prior-to-execution) in hooks.
+In case you need to perform particular request with different URI parameters and standard inheritance of URI parameters isn't working for you, try [modifying transaction before its execution](hooks-nodejs.md#modifying-transaction-request-body-prior-to-execution) in hooks.
 
 ## Testing non-2xx Responses with Swagger
 

@@ -97,7 +97,7 @@ This order [exactly follows the API Blueprint specification][body-schema-attribu
 
 ### Custom Expectations
 
-You can make your own custom expectations in [hooks](hooks.md). For instance, check out how to employ [Chai.js assertions](hooks.md#using-chai-assertions).
+You can make your own custom expectations in [hooks](hooks.md). For instance, check out how to employ [Chai.js assertions](hooks-nodejs.md#using-chai-assertions).
 
 ## Making Your API Description Ready for Testing
 
