@@ -155,38 +155,82 @@ def run_js_extensions(app, docname, source_list):
             raise SphinxError(message.format(name, exitStatus))
 
 
-ref_data = {}
+def to_reference(uri, basedoc=None):
+    if '#' in uri:
+        filename, anchor = uri.split('#', 1)
+        filename = filename or basedoc
+    else:
+        filename = uri
+        anchor = None
+
+    if not filename:
+        message = "For self references like '{}' you need to provide the 'basedoc' argument".format(uri)
+        raise ValueError(message)
+
+    reference = os.path.splitext(filename.lstrip('/'))[0]
+    if anchor:
+        reference += '#' + anchor
+    return reference
+
+
+def parse_reference(reference):
+    if '#' in reference:
+        docname, anchor = reference.split('#', 1)
+    else:
+        docname = reference
+        anchor = None
+    return docname, anchor
 
 
 def collect_ref_data(app, doctree):
-    targets = []
+    filename = doctree.attributes['source'].replace(docs_dir, '').lstrip('/')
+    docname = filename.replace('.md', '')
+
+    anchors = []
     references = []
 
     for node in doctree.traverse(nodes.raw):
         if 'name=' in node.rawsource:
             match = re.search(r'name="([^\"]+)', node.rawsource)
             if match:
-                targets.append(match.group(1))
+                anchors.append(match.group(1))
         elif 'id=' in node.rawsource:
             match = re.search(r'id="([^\"]+)', node.rawsource)
             if match:
-                targets.append(match.group(1))
+                anchors.append(match.group(1))
 
     for node in doctree.traverse(nodes.section):
         for target in frozenset(node.attributes.get('ids', [])):
-            targets.append(target)
+            anchors.append(target)
 
     for node in doctree.traverse(nodes.reference):
         uri = node.get('refuri')
         if uri and not uri.startswith(('http://', 'https://')):
-            references.append(uri)
+            references.append(to_reference(uri, basedoc=docname))
 
-    filename = doctree.attributes['source'].replace(docs_dir, '')
-    ref_data[filename] = {'targets': targets, 'references': references}
+    app.env.metadata[docname]['anchors'] = anchors
+    app.env.metadata[docname]['references'] = references
 
 
 def process_refs(app, doctree, docname):
-    print(ref_data)
+    for reference in app.env.metadata[docname]['references']:
+        referenced_docname, anchor = parse_reference(reference)
+
+        if referenced_docname not in app.env.metadata:
+            message = "Document '{}' is referenced from '{}', but it could not be found"
+            raise SphinxError(message.format(referenced_docname, docname))
+
+        if anchor and anchor not in app.env.metadata[referenced_docname]['anchors']:
+            message = "Section '{}#{}' is referenced from '{}', but it could not be found"
+            raise SphinxError(message.format(referenced_docname, anchor, docname))
+
+        for node in doctree.traverse(nodes.reference):
+            uri = node.get('refuri')
+            if to_reference(uri, basedoc=docname) == reference:
+                fixed_uri = '/{}.html'.format(referenced_docname)
+                if anchor:
+                    fixed_uri += '#{}'.format(anchor)
+                node['refuri'] = fixed_uri
 
 
 def setup(app):
