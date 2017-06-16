@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import subprocess
 from docutils import nodes
 
@@ -113,24 +114,30 @@ html_show_copyright = False
 docs_dir = os.path.dirname(__file__)
 node_modules_bin_dir = os.path.join(docs_dir, '..', 'node_modules', '.bin')
 
+if os.environ.get('READTHEDOCS') == 'True':
+    installation_output = subprocess.getoutput('bash ' + os.path.join(docs_dir, 'install_node.sh'))
+    node_bin = installation_output.splitlines()[-1].strip()
+else:
+    node_bin = 'node'
+
 js_extensions = {
-    'hercule': ['node', os.path.join(node_modules_bin_dir, 'hercule'), '--relative=' + docs_dir, '--stdin'],
+    'hercule': [node_bin, os.path.join(node_modules_bin_dir, 'hercule'), '--relative=' + docs_dir, '--stdin'],
 }
 js_extensions_dir = os.path.join(docs_dir, '_extensions')
 js_interpreters = {
-    '.js': 'node',
-    '.coffee': os.path.join(node_modules_bin_dir, 'coffee')
+    '.js': [node_bin],
+    '.coffee': [node_bin, os.path.join(node_modules_bin_dir, 'coffee')]
 }
 
 
 def init_js_extensions(app):
-    app.info(console.bold('initializing JavaScript extensions... '), nonl=True)
+    app.info(console.bold('initializing Node.js extensions... '), nonl=True)
     for basename in os.listdir(js_extensions_dir):
         _, ext = os.path.splitext(basename)
 
         if ext in js_interpreters.keys():
             filename = os.path.join(js_extensions_dir, basename)
-            command = [js_interpreters[ext], filename]
+            command = js_interpreters[ext] + [filename]
             js_extensions[basename] = command
 
     if js_extensions:
@@ -227,7 +234,7 @@ def process_refs(app, doctree, docname):
         for node in doctree.traverse(nodes.reference):
             uri = node.get('refuri')
             if to_reference(uri, basedoc=docname) == reference:
-                fixed_uri = '/{}.html'.format(referenced_docname)
+                fixed_uri = '{}.html'.format(referenced_docname)
                 if anchor:
                     fixed_uri += '#{}'.format(anchor)
                 node['refuri'] = fixed_uri
