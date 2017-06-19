@@ -40,6 +40,6 @@ process.stdin.on('data', (buffer) ->
 )
 process.stdin.on('end', ->
   renderer = ect({root: {source}})
-  processedLine = renderer.render('source', data)
-  process.stdout.write(processedLine)
+  rendered = renderer.render('source', data)
+  process.stdout.write(rendered)
 )
