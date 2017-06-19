@@ -86,6 +86,15 @@ Also mind that CoffeeScript is production dependency (not dev dependency),
 because it's needed not only for compiling Dredd package before uploading
 to npm, but also for running user-provided hooks written in CoffeeScript.
 
+### Supported Node.js Versions
+
+Given the [table with LTS schedule](https://github.com/nodejs/LTS), only versions marked as **Maintenance** or **Active** are supported, until their **Maintenance End**. The testing matrix of Dredd's CI builds must contain all currently supported versions and must not contain any unsupported versions. The same applies for the underlying libraries, such as [Dredd Transactions][] or [Gavel.js][].
+
+In following files the latest supported Node.js version should be used:
+
+- `appveyor.yml` - Windows CI builds
+- `docs/install_node.sh` - ReadTheDocs docs builds
+
 ### Versioning
 
 Dredd follows [Semantic Versioning][]. To ensure certain stability of Dredd installations (e.g. in CI builds), users can pin their version. They can also use release tags:
@@ -140,18 +149,79 @@ about how it works.
 
 ### Documentation
 
-The main documentation is written in [Markdown][] using [MkDocs][]. Dredd uses
+The main documentation is written in [Markdown][] using [Sphinx][]. Dredd uses
 [ReadTheDocs][] to build and publish the documentation:
 
 - [https://dredd.readthedocs.io](https://dredd.readthedocs.io) - preferred long URL
 - [http://dredd.rtfd.org](http://dredd.rtfd.org) - preferred short URL
 
-Source of the documentation can be found in the [docs][] directory. To contribute to Dredd's documentation, you will need to follow the [MkDocs installation instructions](http://www.mkdocs.org/#installation). Once installed, you may use following commands:
+Source of the documentation can be found in the [docs][] directory. To contribute to Dredd's documentation, you will need Python 3 and Node.js installed.
+
+#### Installation and Development
+
+1.  Make sure `node` is an executable and `npm install` has been done for the Dredd directory. Extensions to the docs are written in Node.js and Sphinx needs to have a way to execute them.
+2.  [Get Python 3](https://www.python.org/downloads/). On macOS, run `brew install python3`.
+3.  Optional step. Create a [virtual environment](https://docs.python.org/3/library/venv.html) and activate it:
+
+    ```sh
+    python3 -m venv ./env
+    . ./env/bin/activate
+    ```
+
+4.  Install dependencies for the docs: `pip3 install -r docs/requirements.txt`
+
+Once installed, you may use following commands:
 
 - `npm run docs:build` - Builds the documentation
 - `npm run docs:serve` - Runs live preview of the documentation
 
-#### Note
+#### Installation on ReadTheDocs
+
+The final documentation gets deployed on the [ReadTheDocs][]. The service, however, does not support Node.js. Therefore on ReadTheDocs, the `conf.py` configuration file for Sphinx runs `docs/install_node.sh`, which installs Node.js locally, using [nvm][].
+
+#### ToC and Markdown
+
+Traditionally, Sphinx only supported the [reStructuredText][] format. Thanks to the [recommonmark][] project it's possible to use also [Markdown][], _almost_ as a format native to Sphinx. Dredd's docs are using the [AutoStructify][] extension to be able to specify _toctree_ and other stuff specific to reStructuredText. The ToC is generated from the _Contents_ section in the `docs/index.md` file.
+
+[recommonmark]: https://github.com/rtfd/recommonmark
+[AutoStructify]: https://recommonmark.readthedocs.io/en/latest/auto_structify.html
+
+#### Node.js Extensions
+
+There are some extensions hooked into the build process of [Sphinx][], modifying how the documents are processed. They're written in Node.js, because:
+
+- It's better to have them in the same language as Dredd.
+- This way they're able to import source files (e.g. `src/options.coffee`).
+
+By default, [Hercule][] is attached as an extension, which means you can use [its syntax](https://github.com/jamesramsay/hercule#transclusion-syntax) for including other Markdown files. All other extensions are custom and are automatically loaded from the `docs/_extensions` directory.
+
+The extension is expected to be a `.js` or `.coffee` script file, which reads the Markdown document from `stdin`, modifies it, and then prints it to `stdout`. When in need of templating, extensions are expected to use the bundled `ect` templating engine.
+
+[Hercule]: https://www.npmjs.com/package/hercule
+
+#### Local References
+
+Currently the [recommonmark][] project has still some limitations in how references to local files work. That's why Dredd's docs have a custom implementation, which also checks whether the destination exists and fails the build in case of broken link. You can use following syntax:
+
+- `[Title](link.md)` to link to other documents
+- `[Title](link.md#section)` to link to sections of other documents
+
+Any `id` HTML attributes generated for headings or manual `<a name="section"></a>` anchors are considered as valid targets. While this feels very natural for a seasoned writer of Markdown, mind that it is much more error prone then [reStructuredText][]'s references.
+
+#### Redirects
+
+Redirects are generated by a script, automatically during the build. It's because ReadTheDocs support only manual setup of redirects through clicking on their website, which is both vendor lock-in and difficult to maintain.
+
+The redirects are configured in the `_redirects/redirects.json` file in following format:
+
+```
+{
+  "original-document": "new-document#section",
+  ...
+}
+```
+
+#### Symlinked Contributing Docs
 
 The `docs/contributing.md` file is a [symbolic link][] to the
 `.github/CONTRIBUTING.md` file, where the actual content lives.
@@ -220,6 +290,8 @@ There is also one environment variable you could find useful:
 
 
 [Apiary]: https://apiary.io/
+[Dredd Transactions]: https://github.com/apiaryio/dredd-transactions
+[Gavel.js]: https://github.com/apiaryio/gavel.js/
 
 [Semantic Versioning]: http://semver.org/
 [coffee-coverage]: https://github.com/benbria/coffee-coverage
@@ -229,7 +301,7 @@ There is also one environment variable you could find useful:
 [Coveralls]: https://coveralls.io/github/apiaryio/dredd
 [lcov-result-merger]: https://github.com/mweibel/lcov-result-merger
 [Markdown]: https://en.wikipedia.org/wiki/Markdown
-[MkDocs]: http://www.mkdocs.org/
+[Sphinx]: http://www.sphinx-doc.org/
 [ReadTheDocs]: https://readthedocs.org/
 [test coverage]: https://coveralls.io/github/apiaryio/dredd
 [Mocha]: http://mochajs.org/
@@ -238,6 +310,8 @@ There is also one environment variable you could find useful:
 [Commitizen CLI]: https://github.com/commitizen/cz-cli
 [md-two-spaces]: https://daringfireball.net/projects/markdown/syntax#p
 [AppVeyor]: https://www.appveyor.com/
+[nvm]: https://github.com/creationix/nvm
+[reStructuredText]: http://www.sphinx-doc.org/en/stable/rest.html
 
 [existing commits]: https://github.com/apiaryio/dredd/commits/master
 [docs]: https://github.com/apiaryio/dredd/tree/master/docs
