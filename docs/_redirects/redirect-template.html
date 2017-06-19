@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="refresh" content="1;url=<%= @dstUrl %>">
+
+        <script type="text/javascript">
+            var dstUrl = '<%= @dstUrl %>';
+            if (dstUrl.indexOf('#') == -1) {
+              dstUrl = dstUrl + window.location.hash;
+            }
+            window.location.href = dstUrl;
+        </script>
+
+        <title>Page Redirection</title>
+    </head>
+    <body>
+        <p>
+            The page <code><%= @srcDocname %></code> no longer exists.
+            It has been replaced by
+            <a href="<%= @dstUrl %>"><code><%= @dstDocname %></code></a>.
+        </p>
+    </body>
+</html>

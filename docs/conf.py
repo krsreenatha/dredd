@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import shutil
 import subprocess
 from docutils import nodes
@@ -240,9 +241,18 @@ def process_refs(app, doctree, docname):
                 node['refuri'] = fixed_uri
 
 
+def generate_redirects(app, env, docnames):
+    subprocess.run([
+        node_bin,
+        os.path.join(node_modules_bin_dir, 'coffee'),
+        'docs/_redirects/generate-redirects.coffee',
+    ])
+
+
 def setup(app):
     init_js_extensions(app)
 
+    app.connect('env-before-read-docs', generate_redirects)
     app.connect('doctree-read', collect_ref_data)
     app.connect('doctree-resolved', process_refs)
 
