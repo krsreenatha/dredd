@@ -1,4 +1,6 @@
 #!/bin/bash
+# In the ReadTheDocs build, this file is ran by Sphinx' conf.py to install
+# support for Node.js.
 
 set -e
 
